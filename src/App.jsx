@@ -1,35 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react";
+import "./App.css";
+import CountryCard from "./components/countryCard";
+import SearchInput from "./components/searchInput";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [country, setCountry] = useState([]);
+  const [filteredCountry, setFilteredCountry] = useState([]);
+
+  const Api_URL =
+    "https://countries-search-data-prod-812920491762.asia-south1.run.app/countries";
+
+  const getCountries = async () => {
+    let resp = await fetch(Api_URL);
+    let respData = await resp.json();
+    setCountry(respData);
+    setFilteredCountry(respData); // default all countries
+  };
+
+  const onSearch = (val) => {
+    console.log("searchVal:", val);
+    if (!val.trim()) {
+      setFilteredCountry(country); // reset if empty
+      return;
+    }
+
+    const filtered = country.filter((c) =>
+      c.common.toLowerCase().includes(val.toLowerCase())
+    );
+    setFilteredCountry(filtered);
+  };
+
+  useEffect(() => {
+    getCountries();
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="xCountriesSearchContainer">
+        <SearchInput onSearch={onSearch} />
+        <br />
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "1em",
+            justifyContent: "center",
+          }}
+        >
+          {filteredCountry.map((data) => (
+            <CountryCard key={data.common} common={data.common} png={data.png} />
+          ))}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
