@@ -11,16 +11,21 @@ function App() {
     "https://countries-search-data-prod-812920491762.asia-south1.run.app/countries";
 
   const getCountries = async () => {
-    let resp = await fetch(Api_URL);
+    try{
+       let resp = await fetch(Api_URL);
     let respData = await resp.json();
     setCountry(respData);
-    setFilteredCountry(respData); // default all countries
+    setFilteredCountry(respData); 
+    }
+   catch(error){
+    console.log(error)
+   }
   };
 
   const onSearch = (val) => {
     console.log("searchVal:", val);
     if (!val.trim()) {
-      setFilteredCountry(country); // reset if empty
+      setFilteredCountry(country); 
       return;
     }
 
